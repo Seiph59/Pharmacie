@@ -55,56 +55,58 @@ def lireMedicament(medicControle, list_medicaments):
     
     for medicament in list_medicaments:
         if medicament.nom == medicControle.capitalize():
-            return "trouvé"
+            return True
     else:    
-        return "j'ai pas trouvé le medicament"
+        return False
+
+def parcoursMedics(listeMedic, entreMed):
+    for medicament in listeMedic:
+        if medicament.nom == entreMed.capitalize():
+            return medicament
+        
 
 def approvisionnement(list_medicaments):
-    boucle = 1
-    while boucle != 0 :
+    boucle = True
+    while boucle != False :
         entreeMedicament = input("Quel medicament souhaitez-vous approvisionner ? : ")
-        lireMedicament(entreeMedicament, list_medicaments)
-        if lireMedicament(entreeMedicament, list_medicaments) =="trouvé":
+        if lireMedicament(entreeMedicament, list_medicaments):
             entreeStock = int(input("Quel est la quantité à ajouter au stock ? :" ))
-            for medicament in medicaments:
-                if medicament.nom == entreeMedicament.capitalize():
-                    medicament.stock = medicament.stock + entreeStock
-            boucle = 0
-    print("nouveau stock : \n" + aspiron.nom, aspiron.stock)    
+            bonMedicament = parcoursMedics(medicaments, entreeMedicament)
+            bonMedicament.stock += entreeStock
+            boucle = False
+    print("nouveau stock : \n" + bonMedicament.nom, bonMedicament.stock)    
 
 def lireClient(clientControle, clientListe):
     for client in clientListe:
         if client.nom == clientControle.capitalize():
-            return "trouvé"
+            return True
     else:
-        return "j'ai pas trouvé le client"
+        return False
 
 def achat(listeClients, listeMedicaments):          
     entreeClient = input(" Nom du client ? :")
-    lireClient(entreeClient, listeClients)
-    if lireClient(entreeClient, listeClients) == "trouvé":
+    if lireClient(entreeClient, listeClients) == True:
         nomCorrect = False
         while nomCorrect != True:
             entreMedicament = input(" Nom du médicament ? :")
-            lireMedicament(entreMedicament, listeMedicaments)
-            if lireMedicament(entreMedicament, listeMedicaments) == "trouvé":
+            if lireMedicament(entreMedicament, listeMedicaments) == True:
                 nomCorrect = True
             entreeQuantite = int(input("Quantité désirée ? :\n"))
-            for medicament in listeMedicaments:
-                if medicament.nom == entreMedicament.capitalize():
-                    if medicament.stock < entreeQuantite :
-                        print("Achat Impossible. Quantite insuffisante\n stock disponible: " +  str(medicament.stock) + "\n")
 
-                    else:
-                        medicament.stock -= entreeQuantite
-                        entreeMontant = int(input("Montant du paiement : "))
-                        for client in listeClients:
-                            if client.nom == entreeClient.capitalize():
-                                print(entreeClient.capitalize())
-                                client.credit = client.credit + entreeMontant - medicament.prix * entreeQuantite
-                                print(client.credit)
-                            else: 
-                                break           
+            bonMedic = parcoursMedics(medicaments, entreMedicament)
+            if bonMedic.stock < entreeQuantite :
+                    print("Achat Impossible. Quantite insuffisante\n stock disponible: " +  str(medicament.stock) + "\n")
+
+            else:
+                bonMedic.stock -= entreeQuantite
+                entreeMontant = int(input("Montant du paiement : "))
+                for client in listeClients:
+                    if client.nom == entreeClient.capitalize():
+                        print(entreeClient.capitalize())
+                        client.credit = client.credit + entreeMontant - bonMedic.prix * entreeQuantite
+                        print(client.credit)
+                    else: 
+                        break           
 
                
 
@@ -127,6 +129,8 @@ while True:
         approvisionnement(medicaments)
     elif choix == 3:
         affichage(clients, medicaments)
+    elif choix == 5:
+        pass
     else:
        sys.exit()         
  
