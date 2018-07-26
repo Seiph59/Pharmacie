@@ -10,8 +10,8 @@ class BaseGraph:
         self.y_label = "Y-axis label"
         
     
-    def show(self, historiqueAspiron):
-        x_values, y_values = self.xy_values(historiqueAspiron)
+    def show(self):
+        x_values, y_values = self.xy_values()
         self.plot(x_values, y_values)
         
         plt.xlabel(self.x_label)
@@ -23,38 +23,22 @@ class BaseGraph:
     def plot(self, x_values, y_values):
         plt.plot(x_values, y_values, '.')
     
-    def xy_values(self,historiques):
+    def xy_values(self):
         return x_values, y_values
         raise NotImplementedError
 
-class AspironGraph(BaseGraph):
+class MedicamentGraph(BaseGraph):
     
-    def __init__(self):
-
-        super(AspironGraph, self).__init__()
-
-        self.title = "Evolution du stock d'Aspiron"
+    def __init__(self,medicament):
+        super(MedicamentGraph, self).__init__()
+        self.medicament = medicament
+        self.title = "Evolution du stock de " + medicament.nom
         self.x_label = "Période"
         self.y_label = "Stock disponible"
 
-    def xy_values(self, historiqueAspiron):
-        x_values = [i for i in range(0,len(historiqueAspiron))]
-        y_values = [aspi for aspi in historiqueAspiron]
-        return x_values, y_values
-
-class RhinoplexilGraph(BaseGraph):
-    
-    def __init__(self):
-
-        super(RhinoplexilGraph, self).__init__()
-
-        self.title = "Evolution du stock de Rhinoplexil"
-        self.x_label = "Période"
-        self.y_label = "Stock disponible"
-
-    def xy_values(self, historiqueRhinoplexil):
-        x_values = [i for i in range(0,len(historiqueRhinoplexil))]
-        y_values = [aspi for aspi in historiqueRhinoplexil]
+    def xy_values(self):
+        x_values = [i for i in range(0,len(self.medicament.historique))]
+        y_values = [aspi for aspi in self.medicament.historique]
         return x_values, y_values
 
 
@@ -64,6 +48,8 @@ class Medicament:
         self.nom = nom
         self.prix = prix
         self.stock = stock
+        self.historique = [stock]
+
         
 
 class Client:
@@ -143,12 +129,7 @@ def approvisionnement(list_medicaments):
             entreeStock = int(input("Quel est la quantité à ajouter au stock ? :" ))
             bonMedicament = parcoursMedics(medicaments, entreeMedicament)
             bonMedicament.stock += entreeStock
-            if bonMedicament == aspiron:
-                historiqueAspiron.append(bonMedicament.stock)
-                print(historiqueAspiron)
-            elif bonMedicament == rhinoplexil:
-                historiqueRhinoplexil.append(bonMedicament.stock)
-                print (historiqueRhinoplexil)
+            bonMedicament.historique.append(bonMedicament.stock)
             boucle = False
     print("nouveau stock : \n" + bonMedicament.nom, bonMedicament.stock)    
 
@@ -175,12 +156,8 @@ def achat(listeClients, listeMedicaments):
 
             else:
                 bonMedic.stock  -= entreeQuantite
-                if bonMedic == aspiron:
-                    historiqueAspiron.append(bonMedic.stock)
-                    print(historiqueAspiron)
-                elif bonMedic == rhinoplexil:
-                    historiqueRhinoplexil.append(bonMedic.stock)
-                    print (historiqueRhinoplexil)
+                bonMedic.historique.append(bonMedic.stock)
+            
                 entreeMontant = int(input("Montant du paiement : "))
                 for client in listeClients:
                     if client.nom == entreeClient.capitalize():
@@ -188,16 +165,13 @@ def achat(listeClients, listeMedicaments):
                         client.credit = client.credit + entreeMontant - bonMedic.prix * entreeQuantite
                         print(client.credit)
                     else: 
-                        break           
-
-historiqueAspiron =[5]
-historiqueRhinoplexil = [5]               
+                        break                         
 
 malfichu = Client("Malfichu",0.0)
 palichon = Client("Palichon",0.0)
  
-aspiron = Medicament("Aspiron", 20.40,historiqueAspiron[-1])
-rhinoplexil = Medicament("Rhinoplexil", 19.15,historiqueRhinoplexil[-1])
+aspiron = Medicament("Aspiron", 20.40, 5)
+rhinoplexil = Medicament("Rhinoplexil", 19.15, 5)
 
 
  
@@ -217,14 +191,15 @@ while True:
     elif choix == 4:
         choix2= menuGraph()
         if choix2 == 1:
-            graph_aspiron = AspironGraph()
-            graph_aspiron.show(historiqueAspiron)
+            graph_aspiron = MedicamentGraph(aspiron)
+            graph_aspiron.show()
         if choix2 ==2:
-            graph_rhinoplexil = RhinoplexilGraph()
-            graph_rhinoplexil.show(historiqueRhinoplexil)
+            graph_rhinoplexil = MedicamentGraph(rhinoplexil)
+            graph_rhinoplexil.show()
     else:
        sys.exit()         
  
 quitter()
+
 
 
